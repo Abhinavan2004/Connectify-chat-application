@@ -1,4 +1,4 @@
-package Springboot_proj.demo;
+package connectifyy;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

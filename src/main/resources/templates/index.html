@@ -1,14 +1,137 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Connectify | Real time chat app</title>
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8" />
+    <title>Connectify | Chat Application</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.1/stomp.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bgDark: '#0B1220',
+                        panelDark: '#111827',
+                        accentBlue: '#38BDF8',
+                        accentRed: '#7F2A2A',
+                        messageArea: '#1F2933'
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body>
-<h1>Connectify!!!</h1>
-<script src="index.js"></script>
+
+<body class="bg-bgDark text-gray-200 min-h-screen flex flex-col">
+
+<!-- NAVBAR -->
+<nav class="w-full border-b border-sky-800 px-12 py-4 flex items-center">
+    <!-- Logo (same space as text earlier) -->
+    <img
+            src="connectifyy_logo.png"
+            alt="Connectify Logo"
+            class="h-10 w-auto object-contain rounded-2xl"
+    />
+</nav>
+
+<!-- MAIN CHAT AREA -->
+<main class="flex-1 flex justify-center pt-10">
+
+    <div class="w-full max-w-6xl px-8">
+
+        <!-- Messages Box -->
+        <div
+                id="chat"
+                class="h-[450px] bg-messageArea rounded-xl border border-yellow-600
+         p-4 overflow-y-auto flex flex-col gap-2"
+        >
+        </div>
+
+
+        <!-- Name Input -->
+        <div class="mt-6">
+            <input
+                    type="text"
+                    id="sender_name"
+                    placeholder="Your Name"
+                    class="w-full bg-accentRed/80 text-accentBlue text-lg placeholder-accentBlue/70 px-6 py-4 rounded-lg border border-yellow-600 focus:outline-none focus:ring-2 focus:ring-accentBlue"
+            />
+        </div>
+
+        <!-- Message Input + Send -->
+        <div class="mt-4 flex gap-4">
+            <input
+                    id="messageInput"
+                    type="text"
+                    placeholder="Your Message"
+                    class="flex-1 bg-accentRed/80 text-accentBlue text-lg placeholder-accentBlue/70 px-6 py-4 rounded-lg border border-yellow-600 focus:outline-none focus:ring-2 focus:ring-accentBlue"
+            />
+
+            <button
+                    id="sendMessage"
+                    class="w-44 bg-sky-800 hover:bg-sky-700 text-xl font-semibold rounded-lg border border-sky-500 transition-all">SEND
+            </button>
+        </div>
+
+    </div>
+</main>
 </body>
+
+<script>
+    let stompClient = null;
+
+    function setConnected(connected) {
+        document.getElementById('sendMessage').disabled = !connected;
+    }
+
+    function connect() {
+        const socket = new SockJS('/chat');
+        stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function () {
+            setConnected(true);
+
+            stompClient.subscribe('/topic/messages', function (message) {
+                showMessage(JSON.parse(message.body));
+            });
+        });
+    }
+    function showMessage(message) {
+        const chat = document.getElementById("chat");
+
+        const messageElement = document.createElement("div");
+        messageElement.className =
+            "bg-slate-700 text-white px-4 py-2 rounded-lg max-w-[70%]";
+
+        messageElement.textContent = message.sender + " : " + message.content;
+
+        chat.appendChild(messageElement);
+        chat.scrollTop = chat.scrollHeight;
+    }
+
+
+    function sendMessage() {
+        const sender = document.getElementById('sender_name').value;
+        const content = document.getElementById('messageInput').value;
+
+        if (!sender || !content) return;
+
+        const chatMessage = {
+            sender: sender,
+            content: content
+        };
+
+        stompClient.send("/app/sendMessage", {}, JSON.stringify(chatMessage));
+        document.getElementById('messageInput').value = '';
+    }
+
+    document.getElementById('sendMessage').onclick = sendMessage;
+    window.onload = connect;
+</script>
+
 </html>

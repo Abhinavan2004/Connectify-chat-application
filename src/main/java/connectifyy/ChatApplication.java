@@ -1,4 +1,4 @@
-package Springboot_proj.demo;
+package connectifyy;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

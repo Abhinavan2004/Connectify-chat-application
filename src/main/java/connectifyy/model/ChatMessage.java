@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChatMessage{
-    private int id;
+    private Integer id;
 
     public String getSender() {
         return sender;
@@ -18,23 +18,23 @@ public class ChatMessage{
         this.sender = sender;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
     public String getMessage_content() {
-        return message_content;
+        return content;
     }
 
     public void setMessage_content(String message_content) {
-        this.message_content = message_content;
+        this.content = content;
     }
 
     private String sender ;
-    private String message_content ;
+    private String content ;
 
 }
